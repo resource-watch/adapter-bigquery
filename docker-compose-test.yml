@@ -1,0 +1,11 @@
+test:
+  extends:
+    file: base.yml
+    service: base
+  ports:
+    - "3095"
+  container_name: adapter-bigquery-test
+  environment:
+    NODE_ENV: test
+    CT_URL: http://mymachine:9000
+  command: test

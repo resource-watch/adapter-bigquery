@@ -1,0 +1,10 @@
+{
+    "logger": {
+        "name": "adapter-bigquery",
+        "level": "info",
+        "toFile": false,
+        "dirLogFile": null
+    },
+    "service": {
+    }
+}

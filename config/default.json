@@ -1,0 +1,13 @@
+{
+     "logger": {
+        "name": "adapter-bigquery-DEV",
+        "level": "debug",
+        "toFile": false,
+        "dirLogFile": null
+    },
+    "service": {
+        "id": "adapter-bigquery_1.0.0",
+        "name": "Adapter Bigquery",
+        "port": 3095
+    }
+}

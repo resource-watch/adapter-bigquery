@@ -1,0 +1,126 @@
+{
+	"name": "#(service.name)",
+	"tags": ["rw"],
+	"endpoints": [{
+		"path": "/v1/query/:dataset",
+		"method": "GET",
+		"binary": true,
+		"redirect": {
+			"method": "POST",
+			"path": "/api/v1/bigquery/query/:dataset"
+		},
+		"filters": [{
+			"name": "dataset",
+			"path": "/v1/dataset/:dataset",
+			"method": "GET",
+			"params": {
+				"dataset": "dataset"
+			},
+			"compare": {
+				"data": {
+					"attributes": {
+						"provider": "bigquery"
+					}
+				}
+			}
+		}]
+	}, {
+		"path": "/v1/query/:dataset",
+		"method": "POST",
+		"binary": true,
+		"redirect": {
+			"method": "POST",
+			"path": "/api/v1/bigquery/query/:dataset"
+		},
+		"filters": [{
+			"name": "dataset",
+			"path": "/v1/dataset/:dataset",
+			"method": "GET",
+			"params": {
+				"dataset": "dataset"
+			},
+			"compare": {
+				"data": {
+					"attributes": {
+						"provider": "bigquery"
+					}
+				}
+			}
+		}]
+	},{
+		"path": "/v1/download/:dataset",
+		"method": "GET",
+		"binary": true,
+		"redirect": {
+			"method": "POST",
+			"path": "/api/v1/bigquery/download/:dataset"
+		},
+		"filters": [{
+			"name": "dataset",
+			"path": "/v1/dataset/:dataset",
+			"method": "GET",
+			"params": {
+				"dataset": "dataset"
+			},
+			"compare": {
+				"data": {
+					"attributes": {
+						"provider": "bigquery"
+					}
+				}
+			}
+		}]
+	}, {
+		"path": "/v1/download/:dataset",
+		"method": "POST",
+		"binary": true,
+		"redirect": {
+			"method": "POST",
+			"path": "/api/v1/bigquery/download/:dataset"
+		},
+		"filters": [{
+			"name": "dataset",
+			"path": "/v1/dataset/:dataset",
+			"method": "GET",
+			"params": {
+				"dataset": "dataset"
+			},
+			"compare": {
+				"data": {
+					"attributes": {
+						"provider": "bigquery"
+					}
+				}
+			}
+		}]
+	}, {
+		"path": "/v1/fields/:dataset",
+		"method": "GET",
+		"redirect": {
+			"method": "POST",
+			"path": "/api/v1/bigquery/fields/:dataset"
+		},
+		"filters": [{
+			"name": "dataset",
+			"path": "/v1/dataset/:dataset",
+			"method": "GET",
+			"params": {
+				"dataset": "dataset"
+			},
+			"compare": {
+				"data": {
+					"attributes": {
+						"provider": "bigquery"
+					}
+				}
+			}
+		}]
+	}, {
+		"path": "/v1/rest-datasets/bigquery",
+		"method": "POST",
+		"redirect": {
+			"method": "POST",
+			"path": "/api/v1/bigquery/rest-datasets/bigquery"
+		}
+	}]
+}
