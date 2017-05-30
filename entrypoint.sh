@@ -4,6 +4,7 @@ set -e
 case "$1" in
     develop)
         echo "Running Development Server"
+        echo -e "$GCLOUD_CREDENTIALS" | base64 -d > credentials.json
         exec grunt --gruntfile app/Gruntfile.js | bunyan
         ;;
     startDev)
@@ -16,6 +17,7 @@ case "$1" in
         ;;
     start)
         echo "Running Start"
+        echo -e "$GCLOUD_CREDENTIALS" | base64 -d > credentials.json
         exec npm start
         ;;
     *)

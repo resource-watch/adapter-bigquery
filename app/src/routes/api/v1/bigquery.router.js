@@ -18,6 +18,29 @@ const serializeObjToQuery = (obj) => Object.keys(obj).reduce((a, k) => {
     return a;
 }, []).join('&');
 
+const deserializer = (obj) => (new Promise((resolve, reject) => {
+    new JSONAPIDeserializer({
+        keyForAttribute: 'camelCase'
+    }).deserialize(obj, (err, data) => {
+        if (err) {
+            reject(err);
+            return;
+        }
+        resolve(data);
+    });
+}));
+
+const deserializeDataset = async(ctx, next) => {
+    logger.debug('Body', ctx.request.body);
+    if (ctx.request.body.dataset && ctx.request.body.dataset.data) {
+        ctx.request.body.dataset = await deserializer(ctx.request.body.dataset);
+    } else {
+        if (ctx.request.body.dataset && ctx.request.body.dataset.table_name) {
+            ctx.request.body.dataset.tableName = ctx.request.body.dataset.table_name;
+        }
+    }
+    await next();
+};
 
 class BigQueryRouter {
 
@@ -35,61 +58,56 @@ class BigQueryRouter {
     }
 
     static async query(ctx) {
-        // ctx.set('Content-type', 'application/json');
-        // const format = ctx.query.format;
-        // const cloneUrl = BigQueryRouter.getCloneUrl(ctx.request.url, ctx.params.dataset);
-        // try {
-        //     ctx.body = passThrough();
-        //     const queryService = await new QueryService(ctx.query.sql, ctx.request.body.dataset, ctx.body, cloneUrl, false, format);
-        //     await queryService.init();
-        //     queryService.execute();
-        //     logger.debug('Finished query');
-        // } catch (err) {
-        //     ctx.body = ErrorSerializer.serializeError(err.statusCode || 500, err.error && err.error.error ? err.error.error[0] : err.message);
-        //     ctx.status = 500;
-        // }
+        ctx.set('Content-type', 'application/json');
+        const format = ctx.query.format;
+        const cloneUrl = BigQueryRouter.getCloneUrl(ctx.request.url, ctx.params.dataset);
+        try {
+            ctx.body = passThrough();
+            const queryService = await new QueryService(ctx.query.sql, ctx.request.body.dataset, ctx.body, cloneUrl, false, format);
+            queryService.execute();
+        } catch (err) {
+            ctx.body = ErrorSerializer.serializeError(err.statusCode || 500, err.error && err.error.error ? err.error.error[0] : err.message);
+            ctx.status = 500;
+        }
     }
 
     static async download(ctx) {
-        // try {
-        //     ctx.body = passThrough();
-        //     const format = ctx.query.format ? ctx.query.format : 'csv';
-        //     let mimetype;
-        //     switch (format) {
-        //
-        //     case 'csv':
-        //         mimetype = 'text/csv';
-        //         break;
-        //     case 'json':
-        //     default:
-        //         mimetype = 'application/json';
-        //         break;
-        //
-        //     }
-        //
-        //     const cloneUrl = BigQueryRouter.getCloneUrl(ctx.request.url, ctx.params.dataset);
-        //     const queryService = await new QueryService(ctx.query.sql, ctx.request.body.dataset, ctx.body, cloneUrl, true, format);
-        //     await queryService.init();
-        //     ctx.set('Content-disposition', `attachment; filename=${ctx.request.body.dataset.id}.${format}`);
-        //     ctx.set('Content-type', mimetype);
-        //
-        //     queryService.execute();
-        //     logger.debug('Finished query');
-        // } catch (err) {
-        //     ctx.body = ErrorSerializer.serializeError(err.statusCode || 500, err.error && err.error.error ? err.error.error[0] : err.message);
-        //     ctx.status = 500;
-        // }
+        try {
+            ctx.body = passThrough();
+            const format = ctx.query.format ? ctx.query.format : 'csv';
+            let mimetype;
+            switch (format) {
+
+            case 'csv':
+                mimetype = 'text/csv';
+                break;
+            case 'json':
+            default:
+                mimetype = 'application/json';
+                break;
+
+            }
+
+            const cloneUrl = BigQueryRouter.getCloneUrl(ctx.request.url, ctx.params.dataset);
+            const queryService = await new QueryService(ctx.query.sql, ctx.request.body.dataset, ctx.body, cloneUrl, true, format);
+            ctx.set('Content-disposition', `attachment; filename=${ctx.request.body.dataset.id}.${format}`);
+            ctx.set('Content-type', mimetype);
+            queryService.execute();
+        } catch (err) {
+            ctx.body = ErrorSerializer.serializeError(err.statusCode || 500, err.error && err.error.error ? err.error.error[0] : err.message);
+            ctx.status = 500;
+        }
     }
 
     static async fields(ctx) {
-        logger.info('Obtaining fields');
+        logger.info(`Obtaining fields of dataset ${ctx.request.body.dataset.id}`);
         const bigQueryService = new BigQueryService(ctx.request.body.dataset.tableName);
         const fields = await bigQueryService.getFields();
         ctx.body = FieldSerializer.serialize(fields, ctx.request.body.dataset.tableName);
     }
 
     static async registerDataset(ctx) {
-        logger.info('Registering dataset with data', ctx.request.body);
+        logger.info('Registering dataset with data', ctx.request.body.connector);
         try {
             const bigQueryService = new BigQueryService(ctx.request.body.connector.tableName);
             await bigQueryService.getFields();
@@ -120,31 +138,6 @@ class BigQueryRouter {
     }
 
 }
-
-const deserializer = (obj) => (new Promise((resolve, reject) => {
-    new JSONAPIDeserializer({
-        keyForAttribute: 'camelCase'
-    }).deserialize(obj, (err, data) => {
-        if (err) {
-            reject(err);
-            return;
-        }
-        resolve(data);
-    });
-}));
-
-const deserializeDataset = async(ctx, next) => {
-    logger.debug('Body', ctx.request.body);
-    if (ctx.request.body.dataset && ctx.request.body.dataset.data) {
-        ctx.request.body.dataset = await deserializer(ctx.request.body.dataset);
-    } else {
-        if (ctx.request.body.dataset && ctx.request.body.dataset.table_name) {
-            ctx.request.body.dataset.tableName = ctx.request.body.dataset.table_name;
-        }
-    }
-    await next();
-};
-
 
 const toSQLMiddleware = async function (ctx, next) {
     const options = {

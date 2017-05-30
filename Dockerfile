@@ -13,7 +13,6 @@ RUN npm install -g grunt-cli bunyan pm2
 
 RUN mkdir -p /opt/$NAME
 COPY package.json /opt/$NAME/package.json
-COPY credentials.json /opt/$NAME/credentials.json
 RUN cd /opt/$NAME && npm install
 
 COPY entrypoint.sh /opt/$NAME/entrypoint.sh
