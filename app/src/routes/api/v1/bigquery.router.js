@@ -8,6 +8,7 @@ const QueryService = require('services/query.service');
 const FieldSerializer = require('serializers/field.serializer');
 const passThrough = require('stream').PassThrough;
 const ErrorSerializer = require('serializers/error.serializer');
+const DatasetNotValid = require('errors/datasetNotValid.error');
 
 const router = new Router({
     prefix: '/bigquery',

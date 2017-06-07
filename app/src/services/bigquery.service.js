@@ -4,6 +4,7 @@ const config = require('config');
 const BigQuery = require('@google-cloud/bigquery');
 const Sql2json = require('sql2json').sql2json;
 const Json2sql = require('sql2json').json2sql;
+const DatasetNotValid = require('errors/datasetNotValid.error');
 
 class BigQueryService {
 
@@ -28,6 +29,9 @@ class BigQueryService {
     }
 
     getBigQueryDatasetParams(tableName) {
+        if (tableName[0] !== '[' || tableName[tableName.length-1] !== ']' || tableName.indexOf(':') === -1 || tableName.indexOf('.') === -1) {
+            throw new DatasetNotValid(`Invalid BigQuery TableName -> [owner:dataset.table]`);
+        }
         const parts = tableName.substr(1, tableName.length - 2).split(':');
         return [parts[0], parts[1].split('.')[0], parts[1].split('.')[1]];
     }
