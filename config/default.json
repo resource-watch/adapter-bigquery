@@ -9,5 +9,8 @@
         "id": "adapter-bigquery_1.0.0",
         "name": "Adapter Bigquery",
         "port": 3095
+    },
+    "gcloud": {
+        "project": "rw-api-167013"
     }
 }
