@@ -14,7 +14,7 @@ class BigQueryService {
         this.dataset = parts[1];
         this.table = parts[2];
         // query
-        this.query = null;
+        this.query = query;
         // if (query) {
         //     const jsonQuery = new Sql2json(query).toJSON();
         //     jsonQuery.from = tableName;
