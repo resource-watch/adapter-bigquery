@@ -190,11 +190,11 @@ const toSQLMiddleware = async function (ctx, next) {
         const result = await ctRegisterMicroservice.requestToMicroservice(options);
 
         if (result.statusCode === 204 || result.statusCode === 200) {
-            logger.info('Query', result.body.data.attributes.query);
             // ctx.query.sql = result.body.data.attributes.query;
-
+            
             // remove it in the future when join is implemented in converter
             ctx.query.sql = sql;
+            logger.info('Query', ctx.query.sql);
             await next();
         } else {
             if (result.statusCode === 400) {
