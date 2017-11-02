@@ -14,12 +14,12 @@ class BigQueryService {
         this.dataset = parts[1];
         this.table = parts[2];
         // query
-        this.query = null;
-        if (query) {
-            const jsonQuery = new Sql2json(query).toJSON();
-            jsonQuery.from = tableName;
-            this.query = Json2sql.toSQL(jsonQuery);
-        }
+        this.query = query;
+        // if (query) {
+        //     const jsonQuery = new Sql2json(query).toJSON();
+        //     jsonQuery.from = tableName;
+        //     this.query = Json2sql.toSQL(jsonQuery);
+        // }
         // if not query -> fields
         const projectId = query ? config.get('gcloud.project') : this.datasetOwner;
         this.bigquery = new BigQuery({
@@ -51,6 +51,7 @@ class BigQueryService {
 
     executeQuery() {
         // @TODO put some limitations!!
+        logger.info('Query in BigQueryService', this.query);
         return this.bigquery.createQueryStream(this.query);
     }
 

@@ -66,9 +66,10 @@ class BigQueryRouter {
             ctx.body = passThrough();
             const queryService = await new QueryService(ctx.query.sql, ctx.request.body.dataset, ctx.body, cloneUrl, false, format);
             queryService.execute();
-        } catch (err) {
+        } catch (err) {            
             ctx.body = ErrorSerializer.serializeError(err.statusCode || 500, err.error && err.error.error ? err.error.error[0] : err.message);
             ctx.status = 500;
+            ctx.body.end();
         }
     }
 
@@ -151,10 +152,12 @@ const toSQLMiddleware = async function (ctx, next) {
         ctx.throw(400, 'sql or fs required');
         return;
     }
-
+    // remove it in the future when join is implemented in converter
+    let sql = null;
     if (ctx.query.sql || ctx.request.body.sql) {
         logger.debug('Checking sql correct');
         const params = Object.assign({}, ctx.query, ctx.request.body);
+        sql = params.sql;
         options.uri = `/convert/sql2SQL?sql=${params.sql}&experimental=true`;
         if (params.geostore) {
             options.uri += `&geostore=${params.geostore}`;
@@ -165,10 +168,8 @@ const toSQLMiddleware = async function (ctx, next) {
             };
             options.method = 'POST';
         }
-        // remove it in the future when join is implemented in converter
-        ctx.query.sql = params.sql;
-        await next();
-        return;
+        
+        
     } else {
         logger.debug('Obtaining sql from featureService');
         const fs = Object.assign({}, ctx.request.body);
@@ -190,8 +191,11 @@ const toSQLMiddleware = async function (ctx, next) {
         const result = await ctRegisterMicroservice.requestToMicroservice(options);
 
         if (result.statusCode === 204 || result.statusCode === 200) {
-            logger.info('Query', result.body.data.attributes.query);
-            ctx.query.sql = result.body.data.attributes.query;
+            // ctx.query.sql = result.body.data.attributes.query;
+            
+            // remove it in the future when join is implemented in converter
+            ctx.query.sql = sql;
+            logger.info('Query', ctx.query.sql);
             await next();
         } else {
             if (result.statusCode === 400) {
