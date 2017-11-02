@@ -155,7 +155,7 @@ const toSQLMiddleware = async function (ctx, next) {
     if (ctx.query.sql || ctx.request.body.sql) {
         logger.debug('Checking sql correct');
         const params = Object.assign({}, ctx.query, ctx.request.body);
-        options.uri = `/convert/sql2SQL?sql=${params.sql}`;
+        options.uri = `/convert/sql2SQL?sql=${params.sql}&experimental=true`;
         if (params.geostore) {
             options.uri += `&geostore=${params.geostore}`;
         }
@@ -186,6 +186,7 @@ const toSQLMiddleware = async function (ctx, next) {
         const result = await ctRegisterMicroservice.requestToMicroservice(options);
 
         if (result.statusCode === 204 || result.statusCode === 200) {
+            logger.info('Query', result.body.data.attributes.query);
             ctx.query.sql = result.body.data.attributes.query;
             await next();
         } else {
