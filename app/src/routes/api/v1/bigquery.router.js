@@ -165,6 +165,10 @@ const toSQLMiddleware = async function (ctx, next) {
             };
             options.method = 'POST';
         }
+        // remove it in the future when join is implemented in converter
+        ctx.query.sql = params.sql;
+        await next();
+        return;
     } else {
         logger.debug('Obtaining sql from featureService');
         const fs = Object.assign({}, ctx.request.body);
