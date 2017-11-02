@@ -66,9 +66,10 @@ class BigQueryRouter {
             ctx.body = passThrough();
             const queryService = await new QueryService(ctx.query.sql, ctx.request.body.dataset, ctx.body, cloneUrl, false, format);
             queryService.execute();
-        } catch (err) {
+        } catch (err) {            
             ctx.body = ErrorSerializer.serializeError(err.statusCode || 500, err.error && err.error.error ? err.error.error[0] : err.message);
             ctx.status = 500;
+            ctx.body.end();
         }
     }
 

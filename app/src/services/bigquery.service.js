@@ -51,6 +51,7 @@ class BigQueryService {
 
     executeQuery() {
         // @TODO put some limitations!!
+        logger.info('Query in BigQueryService', this.query);
         return this.bigquery.createQueryStream(this.query);
     }
 
