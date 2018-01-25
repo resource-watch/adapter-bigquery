@@ -1,5 +1,7 @@
 {
-	"name": "#(service.name)",
+	"name": "Bigquery adapter",
+	"cache": ["adapter-bigquery"],
+	"uncache": ["adapter-bigquery"],
 	"tags": ["rw"],
 	"endpoints": [{
 		"path": "/v1/query/:dataset",
