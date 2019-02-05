@@ -58,6 +58,6 @@
     "request": "^2.79.0",
     "request-promise": "^4.1.1",
     "simple-sql-parser": "git+https://github.com/rrequero/simpleSqlParser.git#between",
-    "sql2json": "2.0.3"
+    "sql2json": "2.0.5"
   }
 }
