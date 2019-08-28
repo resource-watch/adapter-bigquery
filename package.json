@@ -44,6 +44,8 @@
     "babel-preset-stage-3": "^6.11.0",
     "bluebird": "^3.4.7",
     "bunyan": "^1.8.5",
+    "chai": "latest",
+    "chai-http": "^4.3.0",
     "config": "^1.21.0",
     "ct-register-microservice-node": "^2.1.7",
     "json2csv": "^3.7.3",
