@@ -8,4 +8,5 @@ test:
   environment:
     NODE_ENV: test
     CT_URL: http://mymachine:9000
+    GCLOUD_CREDENTIALS: ${GCLOUD_CREDENTIALS}
   command: test

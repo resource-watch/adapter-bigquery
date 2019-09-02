@@ -13,6 +13,7 @@ case "$1" in
         ;;
     test)
         echo "Running Test"
+        echo -e "$GCLOUD_CREDENTIALS" | base64 -d > credentials.json
         exec npm test
         ;;
     start)
