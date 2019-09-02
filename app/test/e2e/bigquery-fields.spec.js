@@ -3,7 +3,7 @@ const nock = require('nock');
 const chai = require('chai');
 // eslint-disable-next-line import/no-unresolved
 const { createRequest } = require('./src/test-server');
-const { createMockBigqueryDataset } = require('./src/mock');
+const { createMockBigqueryDataset, createMockAccessToken } = require('./src/mock');
 
 const should = chai.should();
 
@@ -27,6 +27,7 @@ describe('Fields tests', function () {
         const datasetID = '123';
         // eslint-disable-next-line camelcase
         const table_name = '[test:123.test]';
+        createMockAccessToken();
         createMockBigqueryDataset(datasetID);
         const res = await query.post(datasetID).send({ dataset: { table_name } });
         res.status.should.equal(200);

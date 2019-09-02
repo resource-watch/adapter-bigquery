@@ -22,8 +22,12 @@ const createMockConvertSQL = sqlQuery => nock(process.env.CT_URL, { encodedQuery
         relationships: {}
     });
 
+const createMockAccessToken = () => nock('https://accounts.google.com/').post('/o/oauth2/token').reply(200, { access_token: 'test' });
+
 const createMockRegisterDataset = id => nock(process.env.CT_URL)
     .patch(`/dataset/${id}`)
     .reply(200, {});
 
-module.exports = { createMockConvertSQL, createMockBigqueryGET, createMockBigqueryDataset, createMockRegisterDataset };
+module.exports = {
+    createMockConvertSQL, createMockBigqueryGET, createMockBigqueryDataset, createMockRegisterDataset, createMockAccessToken
+};

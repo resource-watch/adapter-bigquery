@@ -4,7 +4,7 @@ const chai = require('chai');
 // eslint-disable-next-line import/no-unresolved
 const { createRequest } = require('./src/test-server');
 const { ensureCorrectError } = require('./src/utils');
-const { createMockConvertSQL, createMockBigqueryGET } = require('./src/mock');
+const { createMockConvertSQL, createMockBigqueryGET, createMockAccessToken } = require('./src/mock');
 
 const should = chai.should();
 
@@ -30,6 +30,7 @@ describe('Download test', () => {
     it('Download with sql params with format json should return json result (happy case)', async () => {
         const datasetID = '123';
         const sql = 'select * from test';
+        createMockAccessToken();
         createMockConvertSQL(sql);
         createMockBigqueryGET(datasetID);
         const res = await query.post(datasetID).query({ sql, format: 'json' }).send({ dataset: { table_name: '[test:123.test]' } });
@@ -40,6 +41,7 @@ describe('Download test', () => {
     it('Download with sql params with format csv should return csv (happy case)', async () => {
         const datasetID = '123';
         const sql = 'select * from test';
+        createMockAccessToken();
         createMockConvertSQL(sql);
         createMockBigqueryGET(datasetID);
         const res = await query.post(datasetID).query({ sql, format: 'csv' }).send({ dataset: { table_name: '[test:123.test]', id: datasetID } });

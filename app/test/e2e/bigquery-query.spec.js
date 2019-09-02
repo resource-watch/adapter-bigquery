@@ -4,7 +4,7 @@ const chai = require('chai');
 // eslint-disable-next-line import/no-unresolved
 const { createRequest } = require('./src/test-server');
 const { ensureCorrectError } = require('./src/utils');
-const { createMockConvertSQL, createMockBigqueryGET } = require('./src/mock');
+const { createMockConvertSQL, createMockBigqueryGET, createMockAccessToken } = require('./src/mock');
 
 const should = chai.should();
 
@@ -17,6 +17,8 @@ describe('Query tests', function () {
     this.timeout(20000);
 
     before(async () => {
+        nock.cleanAll();
+
         if (process.env.NODE_ENV !== 'test') {
             throw Error(`Running the test suite with NODE_ENV ${process.env.NODE_ENV} may result in permanent data loss. Please use NODE_ENV=test.`);
         }
@@ -30,6 +32,7 @@ describe('Query tests', function () {
     it('Query with sql params should return result (happy case)', async () => {
         const datasetID = '123';
         const sql = 'select * from test';
+        createMockAccessToken();
         createMockConvertSQL(sql);
         createMockBigqueryGET(datasetID);
         const res = await query.post(datasetID).query({ sql }).send({ dataset: { table_name: '[test:123.test]' } });
