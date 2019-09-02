@@ -7,7 +7,8 @@
     "dev": "CT_URL=http://mymachine:9000 LOCAL_URL=http://mymachine:3005 NODE_PATH=app/src PORT=3005 node ./node_modules/.bin/grunt --gruntfile app/Gruntfile.js",
     "start": "NODE_PATH=app/src node $NODE_DEBUG_OPTION app/index.js",
     "test": "NODE_PATH=app/src node $NODE_DEBUG_OPTION ./node_modules/.bin/grunt --gruntfile app/Gruntfile.js e2eTest",
-    "test-watch": "NODE_PATH=app/src CT_URL=http://tower.test node ./node_modules/.bin/grunt --gruntfile app/Gruntfile.js e2eTest-watch"
+    "test-watch": "NODE_PATH=app/src CT_URL=http://tower.test node ./node_modules/.bin/grunt --gruntfile app/Gruntfile.js e2eTest-watch",
+    "coverage": "NODE_PATH=app/src node $NODE_DEBUG_OPTION ./node_modules/.bin/grunt --gruntfile app/Gruntfile.js nyc"
   },
   "keywords": [],
   "author": "",
@@ -34,7 +35,9 @@
     "nock": "^10.0.6",
     "should": "^13.2.3",
     "superagent": "^4.1.0",
-    "supertest": "^3.4.1"
+    "supertest": "^3.4.1",
+    "grunt-simple-nyc": "3.0.0",
+    "nyc": "^14.1.1"
   },
   "dependencies": {
     "@google-cloud/bigquery": "^0.9.4",
