@@ -2,9 +2,9 @@
 const nock = require('nock');
 const chai = require('chai');
 // eslint-disable-next-line import/no-unresolved
-const { createRequest } = require('./src/test-server');
-const { ensureCorrectError } = require('./src/utils');
-const { createMockConvertSQL, createMockBigqueryGET, createMockAccessToken } = require('./src/mock');
+const { createRequest } = require('./utils/test-server');
+const { ensureCorrectError } = require('./utils/helpers');
+const { createMockConvertSQL, createMockBigqueryGET, createMockAccessToken } = require('./utils/mock');
 
 const should = chai.should();
 

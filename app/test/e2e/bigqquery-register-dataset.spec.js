@@ -2,9 +2,9 @@
 const nock = require('nock');
 const chai = require('chai');
 // eslint-disable-next-line import/no-unresolved
-const { createRequest } = require('./src/test-server');
-const { createMockRegisterDataset } = require('./src/mock');
-const { DATASET } = require('./src/test-constants');
+const { createRequest } = require('./utils/test-server');
+const { createMockRegisterDataset } = require('./utils/mock');
+const { DATASET } = require('./utils/test-constants');
 
 const should = chai.should();
 
