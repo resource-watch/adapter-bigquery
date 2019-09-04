@@ -1,8 +1,0 @@
-base:
-  build: .
-  ports:
-    - "3095:3095"
-  container_name: adapter-bigquery-develop
-  environment:
-    PORT: 3095
-    NODE_PATH: app/src
