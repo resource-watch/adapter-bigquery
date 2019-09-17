@@ -1,10 +1,10 @@
 {
-    "logger": {
-        "name": "adapter-bigquery",
-        "level": "debug",
-        "toFile": false,
-        "dirLogFile": null
-    },
-    "service": {
-    }
+  "logger": {
+    "name": "adapter-bigquery",
+    "level": "debug",
+    "toFile": false,
+    "dirLogFile": null
+  },
+  "service": {
+  }
 }
