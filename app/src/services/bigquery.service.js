@@ -1,18 +1,13 @@
-
 const logger = require('logger');
 const config = require('config');
 const BigQuery = require('@google-cloud/bigquery');
-const Sql2json = require('sql2json').sql2json;
-const Json2sql = require('sql2json').json2sql;
 const DatasetNotValid = require('errors/datasetNotValid.error');
 
 class BigQueryService {
 
     constructor(tableName, query = null) {
         const parts = this.getBigQueryDatasetParams(tableName);
-        this.datasetOwner = parts[0];
-        this.dataset = parts[1];
-        this.table = parts[2];
+        [this.datasetOwner, this.dataset, this.table] = parts;
         // query
         this.query = query;
         // if (query) {
@@ -28,8 +23,9 @@ class BigQueryService {
         });
     }
 
+    // eslint-disable-next-line class-methods-use-this
     getBigQueryDatasetParams(tableName) {
-        if (tableName[0] !== '[' || tableName[tableName.length-1] !== ']' || tableName.indexOf(':') === -1 || tableName.indexOf('.') === -1) {
+        if (tableName[0] !== '[' || tableName[tableName.length - 1] !== ']' || tableName.indexOf(':') === -1 || tableName.indexOf('.') === -1) {
             throw new DatasetNotValid(`Invalid BigQuery TableName -> [owner:dataset.table]`);
         }
         const parts = tableName.substr(1, tableName.length - 2).split(':');

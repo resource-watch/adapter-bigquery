@@ -2,13 +2,11 @@ const Router = require('koa-router');
 const logger = require('logger');
 const ctRegisterMicroservice = require('ct-register-microservice-node');
 const JSONAPIDeserializer = require('jsonapi-serializer').Deserializer;
-const Promise = require('bluebird');
 const BigQueryService = require('services/bigquery.service');
 const QueryService = require('services/query.service');
 const FieldSerializer = require('serializers/field.serializer');
 const passThrough = require('stream').PassThrough;
 const ErrorSerializer = require('serializers/error.serializer');
-const DatasetNotValid = require('errors/datasetNotValid.error');
 
 const router = new Router({
     prefix: '/bigquery',
@@ -31,14 +29,12 @@ const deserializer = (obj) => (new Promise((resolve, reject) => {
     });
 }));
 
-const deserializeDataset = async(ctx, next) => {
+const deserializeDataset = async (ctx, next) => {
     logger.debug('Body', ctx.request.body);
     if (ctx.request.body.dataset && ctx.request.body.dataset.data) {
         ctx.request.body.dataset = await deserializer(ctx.request.body.dataset);
-    } else {
-        if (ctx.request.body.dataset && ctx.request.body.dataset.table_name) {
-            ctx.request.body.dataset.tableName = ctx.request.body.dataset.table_name;
-        }
+    } else if (ctx.request.body.dataset && ctx.request.body.dataset.table_name) {
+        ctx.request.body.dataset.tableName = ctx.request.body.dataset.table_name;
     }
     await next();
 };
@@ -60,13 +56,13 @@ class BigQueryRouter {
 
     static async query(ctx) {
         ctx.set('Content-type', 'application/json');
-        const format = ctx.query.format;
+        const { format } = ctx.query;
         const cloneUrl = BigQueryRouter.getCloneUrl(ctx.request.url, ctx.params.dataset);
         try {
             ctx.body = passThrough();
             const queryService = await new QueryService(ctx.query.sql, ctx.request.body.dataset, ctx.body, cloneUrl, false, format);
             queryService.execute();
-        } catch (err) {            
+        } catch (err) {
             ctx.body = ErrorSerializer.serializeError(err.statusCode || 500, err.error && err.error.error ? err.error.error[0] : err.message);
             ctx.status = 500;
             ctx.body.end();
@@ -80,13 +76,13 @@ class BigQueryRouter {
             let mimetype;
             switch (format) {
 
-            case 'csv':
-                mimetype = 'text/csv';
-                break;
-            case 'json':
-            default:
-                mimetype = 'application/json';
-                break;
+                case 'csv':
+                    mimetype = 'text/csv';
+                    break;
+                case 'json':
+                default:
+                    mimetype = 'application/json';
+                    break;
 
             }
 
@@ -141,7 +137,7 @@ class BigQueryRouter {
 
 }
 
-const toSQLMiddleware = async function (ctx, next) {
+const toSQLMiddleware = async (ctx, next) => {
     const options = {
         method: 'GET',
         json: true,
@@ -156,7 +152,7 @@ const toSQLMiddleware = async function (ctx, next) {
     let sql = null;
     if (ctx.query.sql || ctx.request.body.sql) {
         logger.debug('Checking sql correct');
-        const params = Object.assign({}, ctx.query, ctx.request.body);
+        const params = { ...ctx.query, ...ctx.request.body };
         sql = params.sql;
         options.uri = `/convert/sql2SQL?sql=${params.sql}&experimental=true`;
         if (params.geostore) {
@@ -168,15 +164,15 @@ const toSQLMiddleware = async function (ctx, next) {
             };
             options.method = 'POST';
         }
-        
-        
+
+
     } else {
         logger.debug('Obtaining sql from featureService');
-        const fs = Object.assign({}, ctx.request.body);
+        const fs = { ...ctx.request.body };
         delete fs.dataset;
         const query = serializeObjToQuery(ctx.request.query);
         const body = fs;
-        const resultQuery = Object.assign({}, query);
+        const resultQuery = { ...query };
 
         if (resultQuery) {
             options.uri = `/convert/fs2SQL${resultQuery}&tableName=${ctx.request.body.dataset.tableName}`;
@@ -192,18 +188,16 @@ const toSQLMiddleware = async function (ctx, next) {
 
         if (result.statusCode === 204 || result.statusCode === 200) {
             // ctx.query.sql = result.body.data.attributes.query;
-            
+
             // remove it in the future when join is implemented in converter
             ctx.query.sql = sql;
             logger.info('Query', ctx.query.sql);
             await next();
+        } else if (result.statusCode === 400) {
+            ctx.status = result.statusCode;
+            ctx.body = result.body;
         } else {
-            if (result.statusCode === 400) {
-                ctx.status = result.statusCode;
-                ctx.body = result.body;
-            } else {
-                ctx.throw(result.statusCode, result.body);
-            }
+            ctx.throw(result.statusCode, result.body);
         }
 
     } catch (e) {

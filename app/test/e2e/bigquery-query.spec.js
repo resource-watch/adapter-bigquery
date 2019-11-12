@@ -13,9 +13,7 @@ const query = createRequest('/api/v1/bigquery/query/', 'post');
 nock.disableNetConnect();
 nock.enableNetConnect(process.env.HOST_IP);
 
-describe('Query tests', function () {
-    this.timeout(20000);
-
+describe('Query tests', () => {
     before(async () => {
         nock.cleanAll();
 

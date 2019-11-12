@@ -1,7 +1,6 @@
 /* eslint-disable no-unused-vars,no-undef */
 const nock = require('nock');
 const chai = require('chai');
-// eslint-disable-next-line import/no-unresolved
 const { createRequest } = require('./utils/test-server');
 const { createMockBigqueryDataset, createMockAccessToken } = require('./utils/mock');
 
@@ -12,8 +11,7 @@ const query = createRequest('/api/v1/bigquery/fields/', 'post');
 nock.disableNetConnect();
 nock.enableNetConnect(process.env.HOST_IP);
 
-describe('Fields tests', function () {
-    this.timeout(20000);
+describe('Fields tests', () => {
 
     before(async () => {
         nock.cleanAll();
@@ -35,7 +33,7 @@ describe('Fields tests', function () {
 
         const { tableName, fields } = res.body;
         tableName.should.equal(table_name);
-        fields.should.deep.equal([ { name: 'test1', type: 'string' } ]);
+        fields.should.deep.equal([{ name: 'test1', type: 'string' }]);
     });
 
     afterEach(() => {
