@@ -6,6 +6,7 @@ const loader = require('loader');
 const convert = require('koa-convert');
 const ctRegisterMicroservice = require('ct-register-microservice-node');
 const ErrorSerializer = require('serializers/error.serializer');
+const koaSimpleHealthCheck = require('koa-simple-healthcheck');
 
 const koaBody = require('koa-body')({
     multipart: true,
@@ -28,10 +29,16 @@ app.use(async (ctx, next) => {
         try {
             error = JSON.parse(err);
         } catch (e) {
-            logger.error('Error parse');
+            logger.debug('Could not parse error message - is it JSON?: ', err);
+            error = err;
         }
-        ctx.status = error.status || 500;
-        logger.error(error);
+        ctx.status = error.status || ctx.status || 500;
+        if (ctx.status >= 500) {
+            logger.error(error);
+        } else {
+            logger.info(error);
+        }
+
         ctx.body = ErrorSerializer.serializeError(ctx.status, error.message);
         if (process.env.NODE_ENV === 'prod' && this.status === 500) {
             ctx.body = 'Unexpected error';
@@ -42,6 +49,7 @@ app.use(async (ctx, next) => {
 });
 
 app.use(koaLogger());
+app.use(koaSimpleHealthCheck());
 
 loader.loadRoutes(app);
 
