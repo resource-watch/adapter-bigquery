@@ -1,9 +1,9 @@
-/* eslint-disable import/no-extraneous-dependencies */
 const chai = require('chai');
-// eslint-disable-next-line import/no-unresolved
 const chaiHttp = require('chai-http');
 const nock = require('nock');
 const app = require('../../../src/app');
+
+let requester;
 
 chai.use(chaiHttp);
 
@@ -15,9 +15,24 @@ const createRequest = (prefix, method) => {
     const newRequest = chai.request(app).keepOpen();
     const oldHandler = newRequest[method];
 
-    newRequest[method] = url => oldHandler(prefix + (url || ''));
+    newRequest[method] = (url) => oldHandler(prefix + (url || ''));
 
     return newRequest;
 };
 
-module.exports = { createRequest };
+const getTestServer = () => {
+    if (requester) {
+        return requester;
+    }
+
+    nock(`${process.env.CT_URL}`)
+        .post(`/api/v1/microservice`)
+        .reply(200);
+
+    requester = chai.request(app).keepOpen();
+
+    return requester;
+};
+
+
+module.exports = { createRequest, getTestServer };

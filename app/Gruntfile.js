@@ -1,8 +1,8 @@
-'use strict';
 
-module.exports = function (grunt) {
+module.exports = (grunt) => {
 
     grunt.file.setBase('..');
+    // eslint-disable-next-line import/no-extraneous-dependencies
     require('load-grunt-tasks')(grunt);
 
     grunt.initConfig({
@@ -24,6 +24,7 @@ module.exports = function (grunt) {
                 options: {
                     reporter: 'spec',
                     quiet: false, // Optionally suppress output to standard out (defaults to false)
+                    timeout: 20000,
                     clearRequireCache: true, // Optionally clear the require cache before running tests (defaults to false)
                 },
                 src: ['app/test/unit/**/*.test.js']
