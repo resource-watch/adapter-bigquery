@@ -2,8 +2,8 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   labels:
-    name: {name}
-  name: {name}
+    name: bigquery
+  name: bigquery
 spec:
   revisionHistoryLimit: 0
   template:
@@ -11,11 +11,11 @@ spec:
       annotations:
         chaos.alpha.kubernetes.io/enabled: "true"
       labels:
-        name: {name}
+        name: bigquery
     spec:
       containers:
-      - name: {name}
-        image: vizzuality/{name}
+      - name: bigquery
+        image: vizzuality/bigquery
         imagePullPolicy: Always
         resources:
           requests:
@@ -34,7 +34,7 @@ spec:
           - name: NODE_PATH
             value: app/src
           - name: LOCAL_URL
-            value: http://{name}.default.svc.cluster.local:3095
+            value: http://bigquery.default.svc.cluster.local:3095
           - name: GCLOUD_CREDENTIALS
             valueFrom:
                 secretKeyRef:
