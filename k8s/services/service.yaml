@@ -2,10 +2,10 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    name: {name}
-  name: {name}
+    name: bigquery
+  name: bigquery
 spec:
   ports:
     - port: 3095
   selector:
-    name: {name}
+    name: bigquery
