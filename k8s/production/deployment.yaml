@@ -73,7 +73,7 @@ spec:
             failureThreshold: 3
             httpGet:
               path: /healthcheck
-              port: 9000
+              port: 3095
               scheme: HTTP
             initialDelaySeconds: 30
             periodSeconds: 15
@@ -87,7 +87,7 @@ spec:
             failureThreshold: 3
             httpGet:
               path: /healthcheck
-              port: 9000
+              port: 3095
               scheme: HTTP
             initialDelaySeconds: 30
             periodSeconds: 15
