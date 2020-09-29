@@ -1,12 +1,12 @@
 const Router = require('koa-router');
 const logger = require('logger');
 const ctRegisterMicroservice = require('ct-register-microservice-node');
-const JSONAPIDeserializer = require('jsonapi-serializer').Deserializer;
 const BigQueryService = require('services/bigquery.service');
 const QueryService = require('services/query.service');
 const FieldSerializer = require('serializers/field.serializer');
 const passThrough = require('stream').PassThrough;
 const ErrorSerializer = require('serializers/error.serializer');
+const DatasetMiddleware = require('middleware/dataset.middleware');
 
 const router = new Router({
     prefix: '/bigquery',
@@ -16,28 +16,6 @@ const serializeObjToQuery = (obj) => Object.keys(obj).reduce((a, k) => {
     a.push(`${k}=${encodeURIComponent(obj[k])}`);
     return a;
 }, []).join('&');
-
-const deserializer = (obj) => (new Promise((resolve, reject) => {
-    new JSONAPIDeserializer({
-        keyForAttribute: 'camelCase'
-    }).deserialize(obj, (err, data) => {
-        if (err) {
-            reject(err);
-            return;
-        }
-        resolve(data);
-    });
-}));
-
-const deserializeDataset = async (ctx, next) => {
-    logger.debug('Body', ctx.request.body);
-    if (ctx.request.body.dataset && ctx.request.body.dataset.data) {
-        ctx.request.body.dataset = await deserializer(ctx.request.body.dataset);
-    } else if (ctx.request.body.dataset && ctx.request.body.dataset.table_name) {
-        ctx.request.body.dataset.tableName = ctx.request.body.dataset.table_name;
-    }
-    await next();
-};
 
 class BigQueryRouter {
 
@@ -210,9 +188,9 @@ const toSQLMiddleware = async (ctx, next) => {
     }
 };
 
-router.post('/query/:dataset', deserializeDataset, toSQLMiddleware, BigQueryRouter.query);
-router.post('/download/:dataset', deserializeDataset, toSQLMiddleware, BigQueryRouter.download);
-router.post('/fields/:dataset', deserializeDataset, BigQueryRouter.fields);
+router.post('/query/:dataset', DatasetMiddleware.getDatasetById, toSQLMiddleware, BigQueryRouter.query);
+router.post('/download/:dataset', DatasetMiddleware.getDatasetById, toSQLMiddleware, BigQueryRouter.download);
+router.post('/fields/:dataset', DatasetMiddleware.getDatasetById, BigQueryRouter.fields);
 router.post('/rest-datasets/bigquery', BigQueryRouter.registerDataset);
 
 module.exports = router;
