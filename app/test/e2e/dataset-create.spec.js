@@ -1,14 +1,12 @@
-/* eslint-disable no-unused-vars,no-undef */
 const nock = require('nock');
 const chai = require('chai');
-// eslint-disable-next-line import/no-unresolved
-const { createRequest } = require('./utils/test-server');
+const { getTestServer } = require('./utils/test-server');
 const { createMockRegisterDataset } = require('./utils/mock');
 const { DATASET } = require('./utils/test-constants');
 
-const should = chai.should();
+chai.should();
 
-const registerDataset = createRequest('/api/v1/bigquery/rest-datasets/bigquery', 'post');
+const requester = getTestServer();
 
 nock.disableNetConnect();
 nock.enableNetConnect(process.env.HOST_IP);
@@ -24,13 +22,15 @@ describe('Query register dataset tests', () => {
 
     it('Should register dataset', async () => {
         createMockRegisterDataset(DATASET.data.id);
-        const res = await registerDataset.post().send({
-            connector: {
-                connectorUrl: DATASET.data.attributes.connectorUrl,
-                tableName: DATASET.data.attributes.table_name,
-                id: DATASET.data.id,
-            }
-        });
+        const res = await requester
+            .post('/api/v1/bigquery/rest-datasets/bigquery')
+            .send({
+                connector: {
+                    connectorUrl: DATASET.data.attributes.connectorUrl,
+                    tableName: DATASET.data.attributes.table_name,
+                    id: DATASET.data.id,
+                }
+            });
 
         res.status.should.equal(200);
     });
