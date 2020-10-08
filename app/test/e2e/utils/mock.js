@@ -2,8 +2,8 @@
 const nock = require('nock');
 const config = require('config');
 
-const createMockBigqueryDataset = () => nock(`https://www.googleapis.com`)
-    .get(`/bigquery/v2/projects/bigquery-public-data/datasets/ghcn_m/tables/ghcnm_tmax`)
+const createMockBigqueryDataset = (datasetID) => nock(`https://www.googleapis.com`)
+    .get(`/bigquery/v2/projects/test/datasets/${datasetID}/tables/test`)
     .reply(200, { schema: { fields: [{ name: 'test1', type: 'string' }] } });
 
 const createMockBigqueryGET = () => nock('https://www.googleapis.com/')
