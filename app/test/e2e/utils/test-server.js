@@ -7,6 +7,19 @@ let requester;
 
 chai.use(chaiHttp);
 
+const createRequest = (prefix, method) => {
+    nock(process.env.CT_URL)
+        .post(`/api/v1/microservice`)
+        .reply(200);
+
+    const newRequest = chai.request(app).keepOpen();
+    const oldHandler = newRequest[method];
+
+    newRequest[method] = (url) => oldHandler(prefix + (url || ''));
+
+    return newRequest;
+};
+
 const getTestServer = () => {
     if (requester) {
         return requester;
@@ -22,4 +35,4 @@ const getTestServer = () => {
 };
 
 
-module.exports = { getTestServer };
+module.exports = { createRequest, getTestServer };
