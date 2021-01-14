@@ -27,7 +27,6 @@ describe('Fields tests', () => {
         createMockGetDataset(datasetId, { connectorType: 'foo' });
 
         const requestBody = {
-            loggedUser: null
         };
 
         const response = await requester
@@ -45,7 +44,6 @@ describe('Fields tests', () => {
         createMockGetDataset(datasetId, { provider: 'foo' });
 
         const requestBody = {
-            loggedUser: null
         };
 
         const response = await requester

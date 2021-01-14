@@ -27,7 +27,6 @@ describe('Query tests', () => {
         createMockGetDataset(datasetId, { connectorType: 'foo' });
 
         const requestBody = {
-            loggedUser: null
         };
 
         const sql = `select * from ${datasetId}`;
@@ -48,7 +47,6 @@ describe('Query tests', () => {
         createMockGetDataset(datasetId, { provider: 'foo' });
 
         const requestBody = {
-            loggedUser: null
         };
 
         const sql = `select * from ${datasetId}`;
@@ -80,7 +78,6 @@ describe('Query tests', () => {
         const sql = 'select * from test';
 
         createMockGetDataset(datasetId);
-
 
         createMockAccessToken();
         createMockConvertSQL(sql);
