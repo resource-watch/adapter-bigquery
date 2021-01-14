@@ -12,7 +12,9 @@ class QueryService {
         this.download = download;
         this.downloadType = downloadType;
         this.timeout = false;
-        this.timeoutFunc = setTimeout(() => { this.timeout = true; }, 60000);
+        this.timeoutFunc = setTimeout(() => {
+            this.timeout = true;
+        }, 60000);
     }
 
     convertObject(data) {
