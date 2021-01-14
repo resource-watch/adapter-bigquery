@@ -26,7 +26,6 @@ describe('Download test', () => {
         createMockGetDataset(datasetId, { connectorType: 'foo' });
 
         const requestBody = {
-            loggedUser: null
         };
 
         const sql = `select * from ${datasetId}`;
@@ -47,7 +46,6 @@ describe('Download test', () => {
         createMockGetDataset(datasetId, { provider: 'foo' });
 
         const requestBody = {
-            loggedUser: null
         };
 
         const sql = `select * from ${datasetId}`;
@@ -102,7 +100,6 @@ describe('Download test', () => {
         createMockAccessToken();
         createMockConvertSQL(sql);
         createMockBigqueryGET(datasetId);
-
 
         const response = await requester
             .post(`/api/v1/bigquery/download/${datasetId}`)
