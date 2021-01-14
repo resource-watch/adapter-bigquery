@@ -1,3 +1,7 @@
+## 14/01/2021
+
+- Replace CT integration library
+
 # 1.1.0
 
 ## 17/11/2020
@@ -9,6 +13,6 @@
 ## 09/04/2020
 
 - Add node affinity to kubernetes configuration.
-- Update node version to v12.x
-- Replace NPM with Yarn
-- Add healthcheck endpoint
+- Update node version to v12.x.
+- Replace NPM with Yarn.
+- Add healthcheck endpoint.

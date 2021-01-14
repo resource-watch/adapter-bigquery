@@ -1,6 +1,6 @@
 const Router = require('koa-router');
 const logger = require('logger');
-const ctRegisterMicroservice = require('ct-register-microservice-node');
+const { RWAPIMicroservice } = require('rw-api-microservice-node');
 const BigQueryService = require('services/bigquery.service');
 const QueryService = require('services/query.service');
 const FieldSerializer = require('serializers/field.serializer');
@@ -38,7 +38,7 @@ class BigQueryRouter {
         const cloneUrl = BigQueryRouter.getCloneUrl(ctx.request.url, ctx.params.dataset);
         try {
             ctx.body = passThrough();
-            const queryService = await new QueryService(ctx.query.sql, ctx.request.body.dataset, ctx.body, cloneUrl, false, format);
+            const queryService = new QueryService(ctx.query.sql, ctx.request.body.dataset, ctx.body, cloneUrl, false, format);
             queryService.execute();
         } catch (err) {
             ctx.body = ErrorSerializer.serializeError(err.statusCode || 500, err.error && err.error.error ? err.error.error[0] : err.message);
@@ -87,7 +87,7 @@ class BigQueryRouter {
         try {
             const bigQueryService = new BigQueryService(ctx.request.body.connector.tableName);
             await bigQueryService.getFields();
-            await ctRegisterMicroservice.requestToMicroservice({
+            await RWAPIMicroservice.requestToMicroservice({
                 method: 'PATCH',
                 uri: `/dataset/${ctx.request.body.connector.id}`,
                 body: {
@@ -98,7 +98,7 @@ class BigQueryRouter {
                 json: true
             });
         } catch (e) {
-            await ctRegisterMicroservice.requestToMicroservice({
+            await RWAPIMicroservice.requestToMicroservice({
                 method: 'PATCH',
                 uri: `/dataset/${ctx.request.body.connector.id}`,
                 body: {
@@ -143,7 +143,6 @@ const toSQLMiddleware = async (ctx, next) => {
             options.method = 'POST';
         }
 
-
     } else {
         logger.debug('Obtaining sql from featureService');
         const fs = { ...ctx.request.body };
@@ -162,7 +161,7 @@ const toSQLMiddleware = async (ctx, next) => {
     }
 
     try {
-        const result = await ctRegisterMicroservice.requestToMicroservice(options);
+        const result = await RWAPIMicroservice.requestToMicroservice(options);
 
         if (result.statusCode === 204 || result.statusCode === 200) {
             // ctx.query.sql = result.body.data.attributes.query;
