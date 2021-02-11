@@ -83,7 +83,7 @@ spec:
                   key: FASTLY_SERVICEID
                   name: mssecrets
                   optional: true
-          image: vizzuality/bigquery
+          image: gfwdockerhub/bigquery
           imagePullPolicy: Always
           livenessProbe:
             failureThreshold: 3

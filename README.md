@@ -1,6 +1,6 @@
 # Resource Watch BigQuery Adapter
 
-[![Build Status](https://travis-ci.org/resource-watch/adapter-bigquery.svg?branch=dev)](https://travis-ci.org/resource-watch/adapter-bigquery)
+[![Build Status](https://travis-ci.com/resource-watch/adapter-bigquery.svg?branch=dev)](https://travis-ci.com/resource-watch/adapter-bigquery)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/383b48f860c6578ce531/test_coverage)](https://codeclimate.com/github/resource-watch/adapter-bigquery/test_coverage)
 
 This repository is the microservice that implements the BigQuery adapter
