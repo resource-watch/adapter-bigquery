@@ -11,7 +11,7 @@ const requester = getTestServer();
 nock.disableNetConnect();
 nock.enableNetConnect(process.env.HOST_IP);
 
-describe('Download test', () => {
+describe('Download test - POST HTTP verb', () => {
     before(async () => {
         nock.cleanAll();
 

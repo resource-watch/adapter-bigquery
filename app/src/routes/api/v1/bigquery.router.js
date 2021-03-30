@@ -187,9 +187,10 @@ const toSQLMiddleware = async (ctx, next) => {
     }
 };
 
-router.post('/query/:dataset', DatasetMiddleware.getDatasetById, toSQLMiddleware, BigQueryRouter.query);
+router.get('/query/:dataset', DatasetMiddleware.getDatasetById, toSQLMiddleware, BigQueryRouter.query);
+router.get('/download/:dataset', DatasetMiddleware.getDatasetById, toSQLMiddleware, BigQueryRouter.download);
 router.post('/download/:dataset', DatasetMiddleware.getDatasetById, toSQLMiddleware, BigQueryRouter.download);
-router.post('/fields/:dataset', DatasetMiddleware.getDatasetById, BigQueryRouter.fields);
+router.get('/fields/:dataset', DatasetMiddleware.getDatasetById, BigQueryRouter.fields);
 router.post('/rest-datasets/bigquery', BigQueryRouter.registerDataset);
 
 module.exports = router;
