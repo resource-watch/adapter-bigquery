@@ -6,7 +6,7 @@ const { createMockConvertSQL, createMockBigqueryGET, createMockAccessToken } = r
 
 chai.should();
 
-// const query = createRequest('/api/v1/bigquery/query/', 'post');
+// const query = createRequest('/api/v1/bigquery/query/', 'get');
 const requester = getTestServer();
 
 nock.disableNetConnect();
@@ -32,7 +32,7 @@ describe('Query tests', () => {
         const sql = `select * from ${datasetId}`;
 
         const response = await requester
-            .post(`/api/v1/bigquery/query/${datasetId}`)
+            .get(`/api/v1/bigquery/query/${datasetId}`)
             .query({ sql })
             .send(requestBody);
 
@@ -52,7 +52,7 @@ describe('Query tests', () => {
         const sql = `select * from ${datasetId}`;
 
         const response = await requester
-            .post(`/api/v1/bigquery/query/${datasetId}`)
+            .get(`/api/v1/bigquery/query/${datasetId}`)
             .query({ sql })
             .send(requestBody);
 
@@ -67,7 +67,7 @@ describe('Query tests', () => {
         createMockGetDataset(datasetId);
 
         const response = await requester
-            .post(`/api/v1/bigquery/query/${datasetId}`)
+            .get(`/api/v1/bigquery/query/${datasetId}`)
             .send();
 
         ensureCorrectError(response, 'sql or fs required', 400);
@@ -84,7 +84,7 @@ describe('Query tests', () => {
         createMockBigqueryGET(datasetId);
 
         const response = await requester
-            .post(`/api/v1/bigquery/query/${datasetId}`)
+            .get(`/api/v1/bigquery/query/${datasetId}`)
             .query({ sql })
             .send();
 

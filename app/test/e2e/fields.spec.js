@@ -30,7 +30,7 @@ describe('Fields tests', () => {
         };
 
         const response = await requester
-            .post(`/api/v1/bigquery/fields/${datasetId}`)
+            .get(`/api/v1/bigquery/fields/${datasetId}`)
             .send(requestBody);
 
         response.status.should.equal(422);
@@ -47,7 +47,7 @@ describe('Fields tests', () => {
         };
 
         const response = await requester
-            .post(`/api/v1/bigquery/fields/${datasetId}`)
+            .get(`/api/v1/bigquery/fields/${datasetId}`)
             .send(requestBody);
 
         response.status.should.equal(422);
@@ -64,7 +64,7 @@ describe('Fields tests', () => {
         createMockBigqueryDataset();
 
         const response = await requester
-            .post(`/api/v1/bigquery/fields/${datasetId}`)
+            .get(`/api/v1/bigquery/fields/${datasetId}`)
             .send();
 
         response.status.should.equal(200);
