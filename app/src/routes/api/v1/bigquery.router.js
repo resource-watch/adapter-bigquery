@@ -89,25 +89,31 @@ class BigQueryRouter {
             await bigQueryService.getFields();
             await RWAPIMicroservice.requestToMicroservice({
                 method: 'PATCH',
-                uri: `/dataset/${ctx.request.body.connector.id}`,
+                uri: `/v1/dataset/${ctx.request.body.connector.id}`,
                 body: {
                     dataset: {
                         status: 1
                     }
                 },
-                json: true
+                json: true,
+                headers: {
+                    'x-api-key': ctx.request.headers['x-api-key'],
+                }
             });
         } catch (e) {
             await RWAPIMicroservice.requestToMicroservice({
                 method: 'PATCH',
-                uri: `/dataset/${ctx.request.body.connector.id}`,
+                uri: `/v1/dataset/${ctx.request.body.connector.id}`,
                 body: {
                     dataset: {
                         status: 2,
                         errorMessage: `${e.name} - ${e.message}`
                     }
                 },
-                json: true
+                json: true,
+                headers: {
+                    'x-api-key': ctx.request.headers['x-api-key'],
+                }
             });
         }
         ctx.body = {};
@@ -120,7 +126,10 @@ const toSQLMiddleware = async (ctx, next) => {
         method: 'GET',
         json: true,
         resolveWithFullResponse: true,
-        simple: false
+        simple: false,
+        headers: {
+            'x-api-key': ctx.request.headers['x-api-key'],
+        }
     };
     if (!ctx.query.sql && !ctx.request.body.sql && !ctx.query.outFields && !ctx.query.outStatistics) {
         ctx.throw(400, 'sql or fs required');
@@ -132,7 +141,7 @@ const toSQLMiddleware = async (ctx, next) => {
         logger.debug('Checking sql correct');
         const params = { ...ctx.query, ...ctx.request.body };
         sql = params.sql;
-        options.uri = `/convert/sql2SQL?sql=${params.sql}&experimental=true`;
+        options.uri = `/v1/convert/sql2SQL?sql=${params.sql}&experimental=true`;
         if (params.geostore) {
             options.uri += `&geostore=${params.geostore}`;
         }
@@ -152,9 +161,9 @@ const toSQLMiddleware = async (ctx, next) => {
         const resultQuery = { ...query };
 
         if (resultQuery) {
-            options.uri = `/convert/fs2SQL${resultQuery}&tableName=${ctx.request.body.dataset.tableName}`;
+            options.uri = `/v1/convert/fs2SQL${resultQuery}&tableName=${ctx.request.body.dataset.tableName}`;
         } else {
-            options.uri = `/convert/fs2SQL?tableName=${ctx.request.body.dataset.tableName}`;
+            options.uri = `/v1/convert/fs2SQL?tableName=${ctx.request.body.dataset.tableName}`;
         }
         options.body = body;
         options.method = 'POST';

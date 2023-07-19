@@ -2,11 +2,11 @@ const nock = require('nock');
 const chai = require('chai');
 const { getTestServer } = require('./utils/test-server');
 const { createMockBigqueryDataset, createMockAccessToken } = require('./utils/mock');
-const { createMockGetDataset } = require('./utils/helpers');
+const { createMockGetDataset, mockValidateRequestWithApiKey } = require('./utils/helpers');
 
 chai.should();
 
-const requester = getTestServer();
+let requester;
 
 nock.disableNetConnect();
 nock.enableNetConnect(process.env.HOST_IP);
@@ -14,14 +14,15 @@ nock.enableNetConnect(process.env.HOST_IP);
 describe('Fields tests', () => {
 
     before(async () => {
-        nock.cleanAll();
-
         if (process.env.NODE_ENV !== 'test') {
             throw Error(`Running the test suite with NODE_ENV ${process.env.NODE_ENV} may result in permanent data loss. Please use NODE_ENV=test.`);
         }
+
+        requester = await getTestServer();
     });
 
     it('Getting the fields for a dataset without connectorType document should fail', async () => {
+        mockValidateRequestWithApiKey({});
         const datasetId = new Date().getTime();
 
         createMockGetDataset(datasetId, { connectorType: 'foo' });
@@ -31,6 +32,7 @@ describe('Fields tests', () => {
 
         const response = await requester
             .get(`/api/v1/bigquery/fields/${datasetId}`)
+            .set('x-api-key', 'api-key-test')
             .send(requestBody);
 
         response.status.should.equal(422);
@@ -39,6 +41,7 @@ describe('Fields tests', () => {
     });
 
     it('Getting the fields for a dataset without a supported provider should fail', async () => {
+        mockValidateRequestWithApiKey({});
         const datasetId = new Date().getTime();
 
         createMockGetDataset(datasetId, { provider: 'foo' });
@@ -48,6 +51,7 @@ describe('Fields tests', () => {
 
         const response = await requester
             .get(`/api/v1/bigquery/fields/${datasetId}`)
+            .set('x-api-key', 'api-key-test')
             .send(requestBody);
 
         response.status.should.equal(422);
@@ -56,6 +60,7 @@ describe('Fields tests', () => {
     });
 
     it('Getting fields should return result (happy case)', async () => {
+        mockValidateRequestWithApiKey({});
         const datasetId = new Date().getTime();
 
         createMockGetDataset(datasetId);
@@ -65,6 +70,7 @@ describe('Fields tests', () => {
 
         const response = await requester
             .get(`/api/v1/bigquery/fields/${datasetId}`)
+            .set('x-api-key', 'api-key-test')
             .send();
 
         response.status.should.equal(200);

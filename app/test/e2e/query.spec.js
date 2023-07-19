@@ -1,27 +1,27 @@
 const nock = require('nock');
 const chai = require('chai');
 const { getTestServer } = require('./utils/test-server');
-const { ensureCorrectError, createMockGetDataset } = require('./utils/helpers');
+const { ensureCorrectError, createMockGetDataset, mockValidateRequestWithApiKey } = require('./utils/helpers');
 const { createMockConvertSQL, createMockBigqueryGET, createMockAccessToken } = require('./utils/mock');
 
 chai.should();
 
-// const query = createRequest('/api/v1/bigquery/query/', 'get');
-const requester = getTestServer();
+let requester;
 
 nock.disableNetConnect();
 nock.enableNetConnect(process.env.HOST_IP);
 
 describe('Query tests', () => {
     before(async () => {
-        nock.cleanAll();
-
         if (process.env.NODE_ENV !== 'test') {
             throw Error(`Running the test suite with NODE_ENV ${process.env.NODE_ENV} may result in permanent data loss. Please use NODE_ENV=test.`);
         }
+
+        requester = await getTestServer();
     });
 
     it('Query a dataset without connectorType document should fail', async () => {
+        mockValidateRequestWithApiKey({});
         const datasetId = new Date().getTime();
 
         createMockGetDataset(datasetId, { connectorType: 'foo' });
@@ -33,6 +33,7 @@ describe('Query tests', () => {
 
         const response = await requester
             .get(`/api/v1/bigquery/query/${datasetId}`)
+            .set('x-api-key', 'api-key-test')
             .query({ sql })
             .send(requestBody);
 
@@ -42,6 +43,7 @@ describe('Query tests', () => {
     });
 
     it('Query a without a supported provider should fail', async () => {
+        mockValidateRequestWithApiKey({});
         const datasetId = new Date().getTime();
 
         createMockGetDataset(datasetId, { provider: 'foo' });
@@ -53,6 +55,7 @@ describe('Query tests', () => {
 
         const response = await requester
             .get(`/api/v1/bigquery/query/${datasetId}`)
+            .set('x-api-key', 'api-key-test')
             .query({ sql })
             .send(requestBody);
 
@@ -62,18 +65,21 @@ describe('Query tests', () => {
     });
 
     it('Query without sql or fs parameter should return not found', async () => {
+        mockValidateRequestWithApiKey({});
         const datasetId = new Date().getTime();
 
         createMockGetDataset(datasetId);
 
         const response = await requester
             .get(`/api/v1/bigquery/query/${datasetId}`)
+            .set('x-api-key', 'api-key-test')
             .send();
 
         ensureCorrectError(response, 'sql or fs required', 400);
     });
 
     it('Query with sql params should return result (happy case)', async () => {
+        mockValidateRequestWithApiKey({});
         const datasetId = new Date().getTime();
         const sql = 'select * from test';
 
@@ -85,6 +91,7 @@ describe('Query tests', () => {
 
         const response = await requester
             .get(`/api/v1/bigquery/query/${datasetId}`)
+            .set('x-api-key', 'api-key-test')
             .query({ sql })
             .send();
 
@@ -102,6 +109,7 @@ describe('Query tests', () => {
 
         // eslint-disable-next-line camelcase
         const { http_method, url, body } = meta.cloneUrl;
+        // eslint-disable-next-line camelcase
         http_method.should.equal('POST');
         url.should.equal(`/dataset/${datasetId}/clone`);
         body.should.have.property('dataset').and.instanceOf(Object);

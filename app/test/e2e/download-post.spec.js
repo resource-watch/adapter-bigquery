@@ -1,26 +1,27 @@
 const nock = require('nock');
 const chai = require('chai');
 const { getTestServer } = require('./utils/test-server');
-const { ensureCorrectError, createMockGetDataset } = require('./utils/helpers');
+const { ensureCorrectError, createMockGetDataset, mockValidateRequestWithApiKey } = require('./utils/helpers');
 const { createMockConvertSQL, createMockBigqueryGET, createMockAccessToken } = require('./utils/mock');
 
 chai.should();
 
-const requester = getTestServer();
+let requester;
 
 nock.disableNetConnect();
 nock.enableNetConnect(process.env.HOST_IP);
 
 describe('Download test - POST HTTP verb', () => {
     before(async () => {
-        nock.cleanAll();
-
         if (process.env.NODE_ENV !== 'test') {
             throw Error(`Running the test suite with NODE_ENV ${process.env.NODE_ENV} may result in permanent data loss. Please use NODE_ENV=test.`);
         }
+
+        requester = await getTestServer();
     });
 
     it('Download from a dataset without connectorType document should fail', async () => {
+        mockValidateRequestWithApiKey({});
         const datasetId = new Date().getTime();
 
         createMockGetDataset(datasetId, { connectorType: 'foo' });
@@ -32,6 +33,7 @@ describe('Download test - POST HTTP verb', () => {
 
         const response = await requester
             .post(`/api/v1/bigquery/download/${datasetId}`)
+            .set('x-api-key', 'api-key-test')
             .query({ sql })
             .send(requestBody);
 
@@ -41,6 +43,7 @@ describe('Download test - POST HTTP verb', () => {
     });
 
     it('Download from a without a supported provider should fail', async () => {
+        mockValidateRequestWithApiKey({});
         const datasetId = new Date().getTime();
 
         createMockGetDataset(datasetId, { provider: 'foo' });
@@ -52,6 +55,7 @@ describe('Download test - POST HTTP verb', () => {
 
         const response = await requester
             .post(`/api/v1/bigquery/download/${datasetId}`)
+            .set('x-api-key', 'api-key-test')
             .query({ sql })
             .send(requestBody);
 
@@ -61,18 +65,21 @@ describe('Download test - POST HTTP verb', () => {
     });
 
     it('Download without sql or fs parameter should return not found', async () => {
+        mockValidateRequestWithApiKey({});
         const datasetId = new Date().getTime();
 
         createMockGetDataset(datasetId);
 
         const response = await requester
             .post(`/api/v1/bigquery/download/${datasetId}`)
+            .set('x-api-key', 'api-key-test')
             .send();
 
         ensureCorrectError(response, 'sql or fs required', 400);
     });
 
     it('Download with sql params with format json should return json result (happy case)', async () => {
+        mockValidateRequestWithApiKey({});
         const datasetId = new Date().getTime();
         const sql = 'select * from test';
 
@@ -84,6 +91,7 @@ describe('Download test - POST HTTP verb', () => {
 
         const response = await requester
             .post(`/api/v1/bigquery/download/${datasetId}`)
+            .set('x-api-key', 'api-key-test')
             .query({ sql, format: 'json' })
             .send();
 
@@ -92,6 +100,7 @@ describe('Download test - POST HTTP verb', () => {
     });
 
     it('Download with sql params with format csv should return csv (happy case)', async () => {
+        mockValidateRequestWithApiKey({});
         const datasetId = new Date().getTime();
         const sql = 'select * from test';
 
@@ -103,6 +112,7 @@ describe('Download test - POST HTTP verb', () => {
 
         const response = await requester
             .post(`/api/v1/bigquery/download/${datasetId}`)
+            .set('x-api-key', 'api-key-test')
             .query({
                 sql,
                 format: 'csv'

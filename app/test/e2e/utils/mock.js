@@ -10,7 +10,7 @@ const createMockBigqueryGET = () => nock('https://www.googleapis.com/')
     .post(`/bigquery/v2/projects/${config.get('gcloud.project')}/queries`)
     .reply(200, { schema: { fields: [{ name: 'test1', type: 'string' }] }, rows: { f: [{ v: 'test2' }] } });
 
-const createMockConvertSQL = (sqlQuery) => nock(process.env.CT_URL, { encodedQueryParams: true })
+const createMockConvertSQL = (sqlQuery) => nock(process.env.GATEWAY_URL, { encodedQueryParams: true })
     .get(`/v1/convert/sql2SQL?sql=${encodeURIComponent(sqlQuery)}&experimental=true`)
     .reply(200, {
         type: 'result',
@@ -24,7 +24,7 @@ const createMockConvertSQL = (sqlQuery) => nock(process.env.CT_URL, { encodedQue
 
 const createMockAccessToken = () => nock('https://accounts.google.com/').post('/o/oauth2/token').reply(200, { access_token: 'test' });
 
-const createMockRegisterDataset = (id) => nock(process.env.CT_URL)
+const createMockRegisterDataset = (id) => nock(process.env.GATEWAY_URL)
     .patch(`/v1/dataset/${id}`)
     .reply(200, {});
 
