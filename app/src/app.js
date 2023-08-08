@@ -59,6 +59,7 @@ app.use(RWAPIMicroservice.bootstrap({
     requireAPIKey: process.env.REQUIRE_API_KEY || true,
     awsRegion: process.env.AWS_REGION,
     awsCloudWatchLogStreamName: config.get('service.name'),
+    awsCloudWatchLoggingEnabled: process.env.AWS_CLOUD_WATCH_LOGGING_ENABLED || true,
 }));
 
 loader.loadRoutes(app);
